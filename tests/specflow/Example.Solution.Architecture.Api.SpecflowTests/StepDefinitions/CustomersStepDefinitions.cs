@@ -1,19 +1,20 @@
 using NUnit.Framework;
 using System.Net;
+using Example.Solution.Architecture.Api.Features.Customers.Constants;
 
 namespace Example.Solution.Architecture.Api.SpecflowTests.StepDefinitions;
 
 [Binding]
-public sealed class HelloWorldStepDefinitions : IDisposable
+public sealed class CustomersStepDefinitions : IDisposable
 {
     private string _url = TestContext.Parameters.Get<string>("webAppUrl", string.Empty);
     private HttpResponseMessage? _response;
 
-    [Given("I am calling the Hello World endpoint")]
-    public void GivenIAmCallingTheHelloWorldEndpoint()
+    [Given("I am calling the Customers endpoint")]
+    public void GivenIAmCallingTheCustomersEndpoint()
     {
         var url = TestContext.Parameters.Get<string>("webAppUrl", string.Empty);
-        _url = $"{url}/{Api.Features.HelloWorld.Constants.Routes.Root}";
+        _url = $"{url}/{Routes.Root}";
     }
 
     [When("I make a GET request")]

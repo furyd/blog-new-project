@@ -1,13 +1,13 @@
 using FluentAssertions;
 
-namespace Example.Solution.Architecture.Api.UnitTests.Features.HelloWorld.Controllers.HelloWorldTests;
+namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
 
 public class GetTests
 {
     [Fact]
     public void Get_Returns_Ok()
     {
-        var sut = Api.Features.HelloWorld.Controllers.HelloWorld.Get();
+        var sut = Api.Features.Customers.Controllers.Customers.Get();
 
         sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<string>>();
     }
