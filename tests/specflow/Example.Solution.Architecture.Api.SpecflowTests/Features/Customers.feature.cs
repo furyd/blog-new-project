@@ -99,6 +99,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 8
  testRunner.Then("I should get a 200 response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
+#line 9
+ testRunner.And("a list of customers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
             }
             this.ScenarioCleanup();
         }

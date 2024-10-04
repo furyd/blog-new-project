@@ -1,5 +1,7 @@
 using System.Net;
+using System.Text.Json;
 using Example.Solution.Architecture.Api.Features.Customers.Constants;
+using Example.Solution.Architecture.Api.Features.Customers.Models.Responses;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -15,5 +17,9 @@ public class GetTests(WebApplicationFactory<Program> webApplicationFactory) : IC
         var sut = await client.GetAsync(Routes.Root);
 
         sut.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var content = await JsonSerializer.DeserializeAsync<List<Customer>>(await sut.Content.ReadAsStreamAsync());
+
+        content.Should().NotBeNullOrEmpty();
     }
 }

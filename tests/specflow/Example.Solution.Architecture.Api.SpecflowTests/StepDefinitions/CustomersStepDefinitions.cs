@@ -1,6 +1,8 @@
 using NUnit.Framework;
 using System.Net;
+using System.Text.Json;
 using Example.Solution.Architecture.Api.Features.Customers.Constants;
+using Example.Solution.Architecture.Api.Features.Customers.Models.Responses;
 
 namespace Example.Solution.Architecture.Api.SpecflowTests.StepDefinitions;
 
@@ -30,6 +32,15 @@ public sealed class CustomersStepDefinitions : IDisposable
         _response.Should().NotBeNull();
         _response?.StatusCode.Should().Be((HttpStatusCode)statusCode);
     }
+
+    [Then(@"a list of customers")]
+    public async Task ThenAListOfCustomers()
+    {
+        var content = await JsonSerializer.DeserializeAsync<List<Customer>>(await _response!.Content.ReadAsStreamAsync());
+
+        content.Should().NotBeNullOrEmpty();
+    }
+
 
     public void Dispose()
     {
