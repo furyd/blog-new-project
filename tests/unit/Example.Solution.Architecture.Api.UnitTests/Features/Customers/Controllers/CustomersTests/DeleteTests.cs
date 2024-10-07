@@ -3,10 +3,10 @@ using FluentAssertions;
 
 namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
 
-public class GetTests
+public class DeleteTests
 {
     [Fact]
-    public void Get_ReturnsOk_WhenCustomerWithIdExists()
+    public void Delete_RemovesItemFromDataSource()
     {
         var id = Guid.NewGuid();
 
@@ -20,17 +20,19 @@ public class GetTests
             }
         ];
 
-        var sut = Api.Features.Customers.Controllers.Customers.Get(id);
+        var sut = Api.Features.Customers.Controllers.Customers.Delete(id);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<Customer>>();
+        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
+
+        Customer.Customers.Should().BeEmpty();
     }
 
     [Fact]
-    public void Get_ReturnsNotFound_WhenCustomerWithIdDoesNotExist()
+    public void Delete_ReturnsNotFound_WhenCustomerWithIdDoesNotExist()
     {
         var id = Guid.NewGuid();
 
-        var sut = Api.Features.Customers.Controllers.Customers.Get(id);
+        var sut = Api.Features.Customers.Controllers.Customers.Delete(id);
 
         sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound>();
     }
