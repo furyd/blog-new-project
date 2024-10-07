@@ -7,7 +7,23 @@ public static class ComposeDependencies
     public static void AddCustomersFeature(this WebApplication webApplication)
     {
         webApplication
-            .MapGet(Routes.Root, Controllers.Customers.Get)
+            .MapGet(Routes.List, Controllers.Customers.List)
+            ;
+
+        webApplication
+            .MapGet(Routes.Get, Controllers.Customers.Get)
+            ;
+
+        webApplication
+            .MapPost(Routes.Create, Controllers.Customers.Create)
+            ;
+
+        webApplication
+            .MapPut(Routes.Replace, Controllers.Customers.Replace)
+            ;
+
+        webApplication
+            .MapDelete(Routes.Delete, Controllers.Customers.Delete)
             ;
     }
 }
