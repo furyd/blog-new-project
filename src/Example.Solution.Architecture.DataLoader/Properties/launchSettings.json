@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Example.Solution.Architecture.DataLoader": {
+      "commandName": "Project",
+      "commandLineArgs": "\"<your connection string here>\""
+    }
+  }
+}
