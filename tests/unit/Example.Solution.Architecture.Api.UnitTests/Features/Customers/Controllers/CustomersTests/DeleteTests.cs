@@ -1,39 +1,20 @@
-using Example.Solution.Architecture.Api.Features.Customers.Models.Responses;
+using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 using FluentAssertions;
+using Moq;
 
 namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
 
 public class DeleteTests
 {
+    private readonly Mock<ICustomersRepository> _repository = new();
+
     [Fact]
-    public void Delete_RemovesItemFromDataSource()
+    public async Task Delete_ReturnsNoContent()
     {
         var id = Guid.NewGuid();
 
-        Customer.Customers =
-        [
-            new Customer
-            {
-                Id = id,
-                GivenName = "A",
-                FamilyName = "B",
-            }
-        ];
-
-        var sut = Api.Features.Customers.Controllers.Customers.Delete(id);
+        var sut = await Api.Features.Customers.Controllers.Customers.Delete(id, _repository.Object);
 
         sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
-
-        Customer.Customers.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void Delete_ReturnsNotFound_WhenCustomerWithIdDoesNotExist()
-    {
-        var id = Guid.NewGuid();
-
-        var sut = Api.Features.Customers.Controllers.Customers.Delete(id);
-
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound>();
     }
 }
