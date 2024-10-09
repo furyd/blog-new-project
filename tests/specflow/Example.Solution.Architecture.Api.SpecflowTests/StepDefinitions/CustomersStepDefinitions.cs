@@ -44,6 +44,27 @@ public sealed class CustomersStepDefinitions : IDisposable
         _endpoint = Routes.Delete.Replace("{id}", id);
     }
 
+    [Given("I am calling the Customers get endpoint after creating a customer and using that ID")]
+    public async Task GivenIAmCallingTheCustomersGetEndpointAfterCreatingACustomerAndUsingThatId()
+    {
+        var id = await CreateTestUser();
+        GivenIAmCallingTheCustomersGetEndpoint(id);
+    }
+
+    [Given("I am calling the Customers update endpoint after creating a customer and using that ID")]
+    public async Task GivenIAmCallingTheCustomersUpdateEndpointAfterCreatingACustomerAndUsingThatId()
+    {
+        var id = await CreateTestUser();
+        GivenIAmCallingTheCustomersUpdateEndpoint(id);
+    }
+
+    [Given("I am calling the Customers delete endpoint after creating a customer and using that ID")]
+    public async Task GivenIAmCallingTheCustomersDeleteEndpointAfterCreatingACustomerAndUsingThatId()
+    {
+        var id = await CreateTestUser();
+        GivenIAmCallingTheCustomersDeleteEndpoint(id);
+    }
+
 
     [When("I make a GET request")]
     public async Task WhenIMakeAGetRequest()
@@ -117,11 +138,40 @@ public sealed class CustomersStepDefinitions : IDisposable
         content.Should().NotBeNullOrEmpty();
     }
 
+    [Then("I should be provided a location header")]
+    public void ThenIShouldBeProvidedALocationHeader()
+    {
+        _response.Should().NotBeNull();
+        _response?.Headers.Location.Should().NotBeNull();
+    }
+
+
     private async Task WhenIMakeARequest(HttpRequestMessage message)
     {
         using var client = new HttpClient();
         client.BaseAddress = new Uri(_baseUrl);
         _response = await client.SendAsync(message);
+    }
+
+    private async Task<string> CreateTestUser()
+    {
+        var model = new Customer
+        {
+            GivenName = TestContext.Parameters.Get<string>("testUserGivenName", ""),
+            FamilyName = TestContext.Parameters.Get<string>("testUserFamilyName", "")
+        };
+
+        using var message = new HttpRequestMessage(HttpMethod.Post, Routes.Create);
+
+        message.Content = JsonContent.Create(model);
+
+        using var client = new HttpClient();
+
+        client.BaseAddress = new Uri(_baseUrl);
+
+        var response = await client.SendAsync(message);
+
+        return response.Headers.Location?.AbsolutePath.Split("/").LastOrDefault() ?? string.Empty;
     }
 
     public void Dispose()
