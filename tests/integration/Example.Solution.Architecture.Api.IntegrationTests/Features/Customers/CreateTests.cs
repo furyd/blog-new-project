@@ -18,5 +18,7 @@ public class CreateTests
         var sut = await client.PostAsync(Routes.Create, JsonContent.Create(new Api.Features.Customers.Models.Requests.Customer { GivenName = "A", FamilyName = "B" }));
 
         sut.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        sut.Headers.Location.Should().NotBeNull();
     }
 }
