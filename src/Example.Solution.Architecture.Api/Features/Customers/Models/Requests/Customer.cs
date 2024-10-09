@@ -1,8 +1,10 @@
-﻿namespace Example.Solution.Architecture.Api.Features.Customers.Models.Requests;
+﻿using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 
-public class Customer
+namespace Example.Solution.Architecture.Api.Features.Customers.Models.Requests;
+
+public class Customer : ICreateCustomer
 {
-    public string? GivenName { get; set; }
+    public string GivenName { get; set; } = string.Empty;
 
-    public string? FamilyName { get; set; }
+    public string FamilyName { get; set; } = string.Empty;
 }
