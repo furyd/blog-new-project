@@ -2,7 +2,5 @@
 
 public class Customer : Requests.Customer
 {
-    public static List<Customer> Customers = [];
-
     public Guid Id { get; set; }
 }

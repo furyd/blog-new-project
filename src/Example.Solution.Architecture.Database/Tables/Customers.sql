@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[Customers]
+(
+		[Id]				UNIQUEIDENTIFIER		NOT NULL		DEFAULT NEWSEQUENTIALID()
+	,	[RowId]				INT						NOT NULL		IDENTITY(1, 1)
+	,	[GivenName]			NVARCHAR(100)			NOT NULL
+	,	[FamilyName]		NVARCHAR(100)			NOT NULL
+	,	[DateCreated]		DATETIME				NOT NULL		DEFAULT GETDATE()
+	,	[DateUpdated]		DATETIME				NOT NULL		DEFAULT GETDATE()
+)

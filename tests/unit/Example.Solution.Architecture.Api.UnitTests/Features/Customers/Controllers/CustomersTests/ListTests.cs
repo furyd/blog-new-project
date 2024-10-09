@@ -1,34 +1,30 @@
-using Example.Solution.Architecture.Api.Features.Customers.Models.Responses;
+using Example.Solution.Architecture.Domain.Repositories.Interfaces;
+using Example.Solution.Architecture.Domain.Repositories.Models;
 using FluentAssertions;
+using Moq;
 
 namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
 
 public class ListTests
 {
+    private readonly Mock<ICustomersRepository> _repository = new();
+
     [Fact]
-    public void List_ReturnsOk_WhenCustomersExist()
+    public async Task List_ReturnsOk_WhenCustomersExist()
     {
-        Customer.Customers =
-        [
-            new Customer
-            {
-                Id = Guid.NewGuid(),
-                GivenName = "A",
-                FamilyName = "B",
-            }
-        ];
+        _repository.Setup(repository => repository.List()).ReturnsAsync([new Customer()]);
 
-        var sut = Api.Features.Customers.Controllers.Customers.List();
+        var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<List<Customer>>>();
+        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<IEnumerable<Api.Features.Customers.Models.Responses.Customer>>>();
     }
 
     [Fact]
-    public void List_ReturnsNoContent_WhenNoCustomersExist()
+    public async Task List_ReturnsNoContent_WhenNoCustomersExist()
     {
-        Customer.Customers = [];
+        _repository.Setup(repository => repository.List()).ReturnsAsync([]);
 
-        var sut = Api.Features.Customers.Controllers.Customers.List();
+        var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object);
 
         sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
     }

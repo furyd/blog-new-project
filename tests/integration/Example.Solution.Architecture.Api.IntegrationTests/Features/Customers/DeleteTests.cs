@@ -1,15 +1,17 @@
 using Example.Solution.Architecture.Api.Features.Customers.Constants;
+using Example.Solution.Architecture.Api.IntegrationTests.WebApplicationFactories;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 
 namespace Example.Solution.Architecture.Api.IntegrationTests.Features.Customers;
 
-public class DeleteTests(WebApplicationFactory<Program> webApplicationFactory) : IClassFixture<WebApplicationFactory<Program>>
+public class DeleteTests
 {
     [Fact]
     public async Task Get_ReturnsNoContentOrNotFound()
     {
+        await using var webApplicationFactory = IntegrationTestingWebApplicationFactory.Create();
+
         using var client = webApplicationFactory.CreateClient();
 
         var sut = await client.DeleteAsync(Routes.Delete.Replace("{id}", Guid.NewGuid().ToString("D")));

@@ -1,36 +1,34 @@
-using Example.Solution.Architecture.Api.Features.Customers.Models.Responses;
+using Example.Solution.Architecture.Domain.Repositories.Interfaces;
+using Example.Solution.Architecture.Domain.Repositories.Models;
 using FluentAssertions;
+using Moq;
 
 namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
 
 public class GetTests
 {
+    private readonly Mock<ICustomersRepository> _repository = new();
+
     [Fact]
-    public void Get_ReturnsOk_WhenCustomerWithIdExists()
+    public async Task Get_ReturnsOk_WhenCustomerWithIdExists()
     {
         var id = Guid.NewGuid();
 
-        Customer.Customers =
-        [
-            new Customer
-            {
-                Id = id,
-                GivenName = "A",
-                FamilyName = "B",
-            }
-        ];
+        _repository.Setup(repository => repository.Get(It.Is<Guid>(value => value == id))).ReturnsAsync(new Customer());
 
-        var sut = Api.Features.Customers.Controllers.Customers.Get(id);
+        var sut = await Api.Features.Customers.Controllers.Customers.Get(id, _repository.Object);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<Customer>>();
+        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<Api.Features.Customers.Models.Responses.Customer>>();
     }
 
     [Fact]
-    public void Get_ReturnsNotFound_WhenCustomerWithIdDoesNotExist()
+    public async Task Get_ReturnsNotFound_WhenCustomerWithIdDoesNotExist()
     {
         var id = Guid.NewGuid();
 
-        var sut = Api.Features.Customers.Controllers.Customers.Get(id);
+        _repository.Setup(repository => repository.Get(It.Is<Guid>(value => value == id))).ReturnsAsync((Customer?)null);
+
+        var sut = await Api.Features.Customers.Controllers.Customers.Get(id, _repository.Object);
 
         sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound>();
     }

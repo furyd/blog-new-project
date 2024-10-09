@@ -2,6 +2,8 @@ using Example.Solution.Architecture.Api.Features.Customers.Registration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.RegisterCustomersServices();
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
