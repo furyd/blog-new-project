@@ -2,9 +2,9 @@
 
 public interface ICustomersRepository
 {
-    Task<IReadOnlyCollection<ICustomer>> List();
+    Task<IReadOnlyCollection<string>> List();
 
-    Task<ICustomer?> Get(Guid id);
+    Task<IReadOnlyCollection<string>> Get(Guid id);
 
     Task<Guid> Create(ICustomer model);
 

@@ -1,13 +1,12 @@
 ﻿using Dapper;
 using Example.Solution.Architecture.Domain.Factories.Interfaces;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
-using Example.Solution.Architecture.Domain.Repositories.Models;
 
 namespace Example.Solution.Architecture.Domain.Repositories.Implementation;
 
 public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustomersRepository
 {
-    public async Task<IReadOnlyCollection<ICustomer>> List()
+    public async Task<IReadOnlyCollection<string>> List()
     {
         const string sql = """
                            SELECT
@@ -15,14 +14,13 @@ public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustome
                            ,    [GivenName]
                            ,    [FamilyName]
                            FROM [Customers]
+                           FOR JSON PATH
                            """;
 
-        await using var connection = await factory.Create();
-
-        return (await connection.QueryAsync<Customer>(sql)).ToList().AsReadOnly();
+        return await GetJson(sql);
     }
 
-    public async Task<ICustomer?> Get(Guid id)
+    public async Task<IReadOnlyCollection<string>> Get(Guid id)
     {
         const string sql = """
                            SELECT
@@ -31,12 +29,11 @@ public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustome
                            ,    [FamilyName]
                            FROM [Customers]
                            WHERE 1=1
-                           AND [RowId] = @Id
+                           AND [Id] = @id
+                           FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
                            """;
 
-        await using var connection = await factory.Create();
-
-        return await connection.QuerySingleOrDefaultAsync<Customer>(sql, new { id });
+        return await GetJson(sql, new { id });
     }
 
     public async Task<Guid> Create(ICustomer model)
@@ -88,5 +85,12 @@ public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustome
         await using var connection = await factory.Create();
 
         await connection.ExecuteAsync(sql, new { id });
+    }
+
+    private async Task<IReadOnlyCollection<string>> GetJson(string query, object? parameters = null)
+    {
+        await using var connection = await factory.Create();
+
+        return (await connection.QueryAsync<string>(query, parameters)).ToList().AsReadOnly();
     }
 }

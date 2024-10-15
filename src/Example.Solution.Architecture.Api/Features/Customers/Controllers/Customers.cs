@@ -9,9 +9,12 @@ public static class Customers
 {
     public static async Task<IResult> List([FromServices] ICustomersRepository repository)
     {
-        var customers = await repository.List();
+        var results = await repository.List();
 
-        return customers.Count == 0 ? Results.NoContent() : Results.Ok(customers.Select(Map));
+        return results.Count == 0
+            ? Results.NoContent()
+            : new CustomResults.JsonResult(results)
+            ;
     }
 
     public static async Task<IResult> Get(
@@ -19,9 +22,12 @@ public static class Customers
         [FromServices] ICustomersRepository repository
         )
     {
-        var customer = await repository.Get(id);
+        var results = await repository.Get(id);
 
-        return customer is not null ? Results.Ok(Map(customer)) : Results.NotFound();
+        return results.Count == 0
+            ? Results.NotFound()
+            : new CustomResults.JsonResult(results)
+            ;
     }
 
     public static async Task<IResult> Create(
@@ -53,15 +59,5 @@ public static class Customers
         await repository.Delete(id);
 
         return Results.NoContent();
-    }
-
-    private static Models.Responses.Customer Map(ICustomer model)
-    {
-        return new Models.Responses.Customer
-        {
-            Id = model.Id,
-            GivenName = model.GivenName,
-            FamilyName = model.FamilyName
-        };
     }
 }
