@@ -2,7 +2,7 @@
 
 namespace Example.Solution.Architecture.Api.Features.Customers.Models.Requests;
 
-public class Customer : ICreateCustomer
+public class Customer : ICustomer
 {
     public string GivenName { get; set; } = string.Empty;
 

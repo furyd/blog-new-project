@@ -39,7 +39,7 @@ public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustome
         return await connection.QuerySingleOrDefaultAsync<Customer>(sql, new { id });
     }
 
-    public async Task<Guid> Create(ICreateCustomer model)
+    public async Task<Guid> Create(ICustomer model)
     {
         const string sql = """
                            INSERT INTO [Customers]
@@ -60,7 +60,7 @@ public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustome
         return await connection.QuerySingleAsync<Guid>(sql, new { model.GivenName, model.FamilyName });
     }
 
-    public async Task Update(Guid id, ICreateCustomer model)
+    public async Task Update(Guid id, ICustomer model)
     {
         const string sql = """
                            UPDATE [Customers]

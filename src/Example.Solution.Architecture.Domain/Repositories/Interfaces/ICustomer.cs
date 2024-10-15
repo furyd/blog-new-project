@@ -1,6 +1,8 @@
 ﻿namespace Example.Solution.Architecture.Domain.Repositories.Interfaces;
 
-public interface ICustomer : ICreateCustomer
+public interface ICustomer
 {
-    Guid Id { get; }
+    string GivenName { get; }
+
+    string FamilyName { get; }
 }

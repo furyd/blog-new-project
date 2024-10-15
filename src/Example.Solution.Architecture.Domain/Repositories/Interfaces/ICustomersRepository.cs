@@ -6,9 +6,9 @@ public interface ICustomersRepository
 
     Task<ICustomer?> Get(Guid id);
 
-    Task<Guid> Create(ICreateCustomer model);
+    Task<Guid> Create(ICustomer model);
 
-    Task Update(Guid id, ICreateCustomer model);
+    Task Update(Guid id, ICustomer model);
 
     Task Delete(Guid id);
 }
