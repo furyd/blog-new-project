@@ -13,7 +13,7 @@ public class ListTests
     [Fact]
     public async Task Get_ReturnsOK_WhenThereAreCustomers()
     {
-        var customers = new Faker<Domain.Repositories.Models.Customer>()
+        var customers = new Faker<Models.Customer>()
             .RuleFor(model => model.Id, faker => faker.Random.Guid())
             .RuleFor(model => model.GivenName, faker => faker.Name.FirstName())
             .RuleFor(model => model.FamilyName, faker => faker.Name.LastName())
