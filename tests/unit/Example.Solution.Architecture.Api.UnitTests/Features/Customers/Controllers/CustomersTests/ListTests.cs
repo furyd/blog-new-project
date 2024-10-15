@@ -1,3 +1,4 @@
+using Example.Solution.Architecture.Api.Models;
 using Example.Solution.Architecture.Api.UnitTests.Factories;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 using FluentAssertions;
@@ -13,7 +14,7 @@ public class ListTests
     [Fact]
     public async Task List_ReturnsOk_WhenCustomersExist()
     {
-        _repository.Setup(repository => repository.List()).ReturnsAsync(["A"]);
+        _repository.Setup(repository => repository.List(new Pagination(20, 1))).ReturnsAsync(["A"]);
 
         var context = HttpContextFactory.Create();
 
@@ -27,7 +28,7 @@ public class ListTests
     [Fact]
     public async Task List_ReturnsNoContent_WhenNoCustomersExist()
     {
-        _repository.Setup(repository => repository.List()).ReturnsAsync([]);
+        _repository.Setup(repository => repository.List(new Pagination(20, 1))).ReturnsAsync([]);
 
         var context = HttpContextFactory.Create();
 

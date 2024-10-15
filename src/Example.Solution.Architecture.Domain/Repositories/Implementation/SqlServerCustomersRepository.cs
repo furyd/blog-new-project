@@ -6,7 +6,7 @@ namespace Example.Solution.Architecture.Domain.Repositories.Implementation;
 
 public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustomersRepository
 {
-    public async Task<IReadOnlyCollection<string>> List()
+    public async Task<IReadOnlyCollection<string>> List(IPagination pagination)
     {
         const string sql = """
                            SELECT
@@ -14,10 +14,17 @@ public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustome
                            ,    [GivenName]
                            ,    [FamilyName]
                            FROM [Customers]
+                           ORDER BY [Id]
+                           OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY
                            FOR JSON PATH
                            """;
 
-        return await GetJson(sql);
+        var currentPage = pagination.CurrentPage < 1
+            ? 0
+            : pagination.CurrentPage - 1
+            ;
+
+        return await GetJson(sql, new { rows = pagination.PageSize, offset = currentPage * pagination.PageSize });
     }
 
     public async Task<IReadOnlyCollection<string>> Get(Guid id)

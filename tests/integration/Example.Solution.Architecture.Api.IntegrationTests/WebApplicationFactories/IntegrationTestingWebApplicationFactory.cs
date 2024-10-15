@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using System.Text.Json;
+using Example.Solution.Architecture.Api.Models;
 
 namespace Example.Solution.Architecture.Api.IntegrationTests.WebApplicationFactories;
 
@@ -39,7 +40,7 @@ public sealed class IntegrationTestingWebApplicationFactory : WebApplicationFact
     {
         var mockRepository = new Mock<ICustomersRepository>();
 
-        mockRepository.Setup(repository => repository.List()).ReturnsAsync(_customers.Count == 0 ? [] : [JsonSerializer.Serialize(_customers)]);
+        mockRepository.Setup(repository => repository.List(new Pagination(20, 1))).ReturnsAsync(_customers.Count == 0 ? [] : [JsonSerializer.Serialize(_customers)]);
 
         mockRepository.Setup(repository => repository.Create(It.IsAny<ICustomer>())).ReturnsAsync((ICustomer customer) =>
         {

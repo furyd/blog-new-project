@@ -2,7 +2,7 @@
 
 public interface ICustomersRepository
 {
-    Task<IReadOnlyCollection<string>> List();
+    Task<IReadOnlyCollection<string>> List(IPagination pagination);
 
     Task<IReadOnlyCollection<string>> Get(Guid id);
 

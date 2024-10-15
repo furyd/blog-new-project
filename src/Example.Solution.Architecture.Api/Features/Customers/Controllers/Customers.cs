@@ -1,5 +1,6 @@
 ﻿using Example.Solution.Architecture.Api.Features.Customers.Constants;
 using Example.Solution.Architecture.Api.Features.Customers.Models.Requests;
+using Example.Solution.Architecture.Api.Models;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +8,13 @@ namespace Example.Solution.Architecture.Api.Features.Customers.Controllers;
 
 public static class Customers
 {
-    public static async Task<IResult> List([FromServices] ICustomersRepository repository)
+    public static async Task<IResult> List(
+        [FromServices] ICustomersRepository repository,
+        [FromQuery(Name = "page-size")] int pageSize = 20,
+        [FromQuery(Name = "page")] int currentPage = 1
+        )
     {
-        var results = await repository.List();
+        var results = await repository.List(new Pagination(pageSize, currentPage));
 
         return results.Count == 0
             ? Results.NoContent()
