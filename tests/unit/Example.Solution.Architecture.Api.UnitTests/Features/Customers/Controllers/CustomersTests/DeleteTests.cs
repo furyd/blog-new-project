@@ -1,5 +1,7 @@
+using Example.Solution.Architecture.Api.UnitTests.Factories;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Moq;
 
 namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
@@ -13,8 +15,12 @@ public class DeleteTests
     {
         var id = Guid.NewGuid();
 
+        var context = HttpContextFactory.Create();
+
         var sut = await Api.Features.Customers.Controllers.Customers.Delete(id, _repository.Object);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
+        await sut.ExecuteAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status204NoContent);
     }
 }

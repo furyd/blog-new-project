@@ -1,6 +1,7 @@
+using Example.Solution.Architecture.Api.UnitTests.Factories;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
-using Example.Solution.Architecture.Domain.Repositories.Models;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Moq;
 
 namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
@@ -12,11 +13,15 @@ public class ListTests
     [Fact]
     public async Task List_ReturnsOk_WhenCustomersExist()
     {
-        _repository.Setup(repository => repository.List()).ReturnsAsync([new Customer()]);
+        _repository.Setup(repository => repository.List()).ReturnsAsync(["A"]);
+
+        var context = HttpContextFactory.Create();
 
         var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<IEnumerable<Api.Features.Customers.Models.Responses.Customer>>>();
+        await sut.ExecuteAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
     }
 
     [Fact]
@@ -24,8 +29,12 @@ public class ListTests
     {
         _repository.Setup(repository => repository.List()).ReturnsAsync([]);
 
+        var context = HttpContextFactory.Create();
+
         var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NoContent>();
+        await sut.ExecuteAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status204NoContent);
     }
 }

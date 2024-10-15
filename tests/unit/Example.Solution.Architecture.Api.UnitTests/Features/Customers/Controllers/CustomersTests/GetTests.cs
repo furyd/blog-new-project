@@ -1,6 +1,7 @@
+using Example.Solution.Architecture.Api.UnitTests.Factories;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
-using Example.Solution.Architecture.Domain.Repositories.Models;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Moq;
 
 namespace Example.Solution.Architecture.Api.UnitTests.Features.Customers.Controllers.CustomersTests;
@@ -14,11 +15,15 @@ public class GetTests
     {
         var id = Guid.NewGuid();
 
-        _repository.Setup(repository => repository.Get(It.Is<Guid>(value => value == id))).ReturnsAsync(new Customer());
+        _repository.Setup(repository => repository.Get(It.Is<Guid>(value => value == id))).ReturnsAsync(["A"]);
+
+        var context = HttpContextFactory.Create();
 
         var sut = await Api.Features.Customers.Controllers.Customers.Get(id, _repository.Object);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<Api.Features.Customers.Models.Responses.Customer>>();
+        await sut.ExecuteAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
     }
 
     [Fact]
@@ -26,10 +31,14 @@ public class GetTests
     {
         var id = Guid.NewGuid();
 
-        _repository.Setup(repository => repository.Get(It.Is<Guid>(value => value == id))).ReturnsAsync((Customer?)null);
+        _repository.Setup(repository => repository.Get(It.Is<Guid>(value => value == id))).ReturnsAsync([]);
+
+        var context = HttpContextFactory.Create();
 
         var sut = await Api.Features.Customers.Controllers.Customers.Get(id, _repository.Object);
 
-        sut.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound>();
+        await sut.ExecuteAsync(context);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status404NotFound);
     }
 }
