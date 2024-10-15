@@ -1,11 +1,12 @@
-﻿using Example.Solution.Architecture.Domain.Repositories.Interfaces;
-using Example.Solution.Architecture.Domain.Repositories.Models;
+﻿using Example.Solution.Architecture.Api.IntegrationTests.Models;
+using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using System.Text.Json;
 
 namespace Example.Solution.Architecture.Api.IntegrationTests.WebApplicationFactories;
 
@@ -38,9 +39,9 @@ public sealed class IntegrationTestingWebApplicationFactory : WebApplicationFact
     {
         var mockRepository = new Mock<ICustomersRepository>();
 
-        mockRepository.Setup(repository => repository.List()).ReturnsAsync(_customers);
+        mockRepository.Setup(repository => repository.List()).ReturnsAsync(_customers.Count == 0 ? [] : [JsonSerializer.Serialize(_customers)]);
 
-        mockRepository.Setup(repository => repository.Create(It.IsAny<ICreateCustomer>())).ReturnsAsync((ICreateCustomer customer) =>
+        mockRepository.Setup(repository => repository.Create(It.IsAny<ICustomer>())).ReturnsAsync((ICustomer customer) =>
         {
             var id = Guid.NewGuid();
 
@@ -54,9 +55,19 @@ public sealed class IntegrationTestingWebApplicationFactory : WebApplicationFact
             return id;
         });
 
-        mockRepository.Setup(repository => repository.Get(It.IsAny<Guid>())).ReturnsAsync((Guid id) => _customers.FirstOrDefault(customer => customer.Id == id));
+        mockRepository.Setup(repository => repository.Get(It.IsAny<Guid>())).ReturnsAsync((Guid id) =>
+        {
+            var customer = _customers.FirstOrDefault(customer => customer.Id == id);
 
-        mockRepository.Setup(repository => repository.Update(It.IsAny<Guid>(), It.IsAny<ICreateCustomer>())).Returns((Guid id, ICreateCustomer customer) =>
+            if (customer is null)
+            {
+                return [];
+            }
+
+            return [JsonSerializer.Serialize(customer)];
+        });
+
+        mockRepository.Setup(repository => repository.Update(It.IsAny<Guid>(), It.IsAny<ICustomer>())).Returns((Guid id, ICustomer customer) =>
         {
             var existingCustomer = _customers.FirstOrDefault(item => item.Id == id);
 
