@@ -1,4 +1,6 @@
 ﻿using Example.Solution.Architecture.Api.Features.Customers.Constants;
+using Example.Solution.Architecture.Api.Services.Implementation;
+using Example.Solution.Architecture.Api.Services.Interfaces;
 using Example.Solution.Architecture.Api.Settings.Implementation;
 using Example.Solution.Architecture.Api.Settings.Registration;
 using Example.Solution.Architecture.Domain.Factories.Implementation;
@@ -15,6 +17,8 @@ public static class ComposeDependencies
         builder.Services.RegisterSettings(builder.Configuration);
         builder.Services.AddSingleton<IConnectionFactory, SqlServerConnectionFactory<DatabaseSettings>>();
         builder.Services.AddScoped<ICustomersRepository, SqlServerCustomersRepository>();
+        builder.Services.AddSingleton<ILinksService, DefaultLinksService>();
+        builder.Services.AddHttpContextAccessor();
     }
 
     public static void AddCustomersFeature(this WebApplication webApplication)
