@@ -1,8 +1,10 @@
-﻿namespace Example.Solution.Architecture.Domain.Repositories.Interfaces;
+﻿using Example.Solution.Architecture.Domain.Abstractions;
+
+namespace Example.Solution.Architecture.Domain.Repositories.Interfaces;
 
 public interface ICustomersRepository
 {
-    Task<IReadOnlyCollection<string>> List(IPagination pagination);
+    Task<IPagedResults<string>> List(IPagination pagination);
 
     Task<IReadOnlyCollection<string>> Get(Guid id);
 

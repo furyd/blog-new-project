@@ -1,5 +1,7 @@
 ﻿using Example.Solution.Architecture.Api.IntegrationTests.Models;
+using Example.Solution.Architecture.Api.Models;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
+using Example.Solution.Architecture.Domain.Repositories.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -7,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using System.Text.Json;
-using Example.Solution.Architecture.Api.Models;
 
 namespace Example.Solution.Architecture.Api.IntegrationTests.WebApplicationFactories;
 
@@ -40,7 +41,9 @@ public sealed class IntegrationTestingWebApplicationFactory : WebApplicationFact
     {
         var mockRepository = new Mock<ICustomersRepository>();
 
-        mockRepository.Setup(repository => repository.List(new Pagination(20, 1))).ReturnsAsync(_customers.Count == 0 ? [] : [JsonSerializer.Serialize(_customers)]);
+        var pagination = new Pagination(20, 1);
+
+        mockRepository.Setup(repository => repository.List(pagination)).ReturnsAsync(new PagedData<string>(_customers.Count, _customers.Count == 0 ? [] : [JsonSerializer.Serialize(_customers.Skip((pagination.CurrentPage - 1) * pagination.PageSize).Take(pagination.PageSize))]));
 
         mockRepository.Setup(repository => repository.Create(It.IsAny<ICustomer>())).ReturnsAsync((ICustomer customer) =>
         {

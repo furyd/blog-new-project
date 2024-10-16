@@ -1,6 +1,8 @@
-﻿using Example.Solution.Architecture.Api.Features.Customers.Constants;
+﻿using Example.Solution.Architecture.Api.Constants;
+using Example.Solution.Architecture.Api.Features.Customers.Constants;
 using Example.Solution.Architecture.Api.Features.Customers.Models.Requests;
 using Example.Solution.Architecture.Api.Models;
+using Example.Solution.Architecture.Api.Services.Interfaces;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,16 +12,23 @@ public static class Customers
 {
     public static async Task<IResult> List(
         [FromServices] ICustomersRepository repository,
-        [FromQuery(Name = "page-size")] int pageSize = 20,
-        [FromQuery(Name = "page")] int currentPage = 1
+        [FromServices] ILinksService service,
+        [FromQuery(Name = QueryStrings.PageSize)] int pageSize = 20,
+        [FromQuery(Name = QueryStrings.PageNumber)] int currentPage = 1
         )
     {
-        var results = await repository.List(new Pagination(pageSize, currentPage));
+        var pagination = new Pagination(pageSize, currentPage);
 
-        return results.Count == 0
-            ? Results.NoContent()
-            : new CustomResults.JsonResult(results)
-            ;
+        var results = await repository.List(pagination);
+
+        if (results.RecordCount == 0 || results.Data.Count == 0)
+        {
+            return Results.NoContent();
+        }
+
+        var links = service.GetLinks(pagination, results.RecordCount);
+
+        return new CustomResults.PagedJsonResult(results.Data, links);
     }
 
     public static async Task<IResult> Get(

@@ -1,14 +1,19 @@
 ﻿using Dapper;
+using Example.Solution.Architecture.Domain.Abstractions;
 using Example.Solution.Architecture.Domain.Factories.Interfaces;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
+using Example.Solution.Architecture.Domain.Repositories.Models;
 
 namespace Example.Solution.Architecture.Domain.Repositories.Implementation;
 
 public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustomersRepository
 {
-    public async Task<IReadOnlyCollection<string>> List(IPagination pagination)
+    public async Task<IPagedResults<string>> List(IPagination pagination)
     {
         const string sql = """
+                           SELECT COUNT(1) AS [Total]
+                           FROM [Customers]
+                           ;
                            SELECT
                                 [Id]
                            ,    [GivenName]
@@ -24,7 +29,15 @@ public class SqlServerCustomersRepository(IConnectionFactory factory) : ICustome
             : pagination.CurrentPage - 1
             ;
 
-        return await GetJson(sql, new { rows = pagination.PageSize, offset = currentPage * pagination.PageSize });
+        await using var connection = await factory.Create();
+
+        await using var multi = await connection.QueryMultipleAsync(sql, new { rows = pagination.PageSize, offset = currentPage * pagination.PageSize });
+
+        var total = await multi.ReadSingleAsync<int>();
+
+        var data = await multi.ReadAsync<string>();
+
+        return new PagedData<string>(total, data.ToList().AsReadOnly());
     }
 
     public async Task<IReadOnlyCollection<string>> Get(Guid id)
