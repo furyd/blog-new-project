@@ -13,15 +13,18 @@ public class ListTests
 {
     private readonly Mock<ICustomersRepository> _repository = new();
     private readonly Mock<ILinksService> _linksService = new();
+    private readonly Mock<IHttpContextAccessor> _accessor = new();
 
     [Fact]
     public async Task List_ReturnsOk_WhenCustomersExist()
     {
+        _accessor.Setup(accessor => accessor.HttpContext).Returns(new DefaultHttpContext());
+
         _repository.Setup(repository => repository.List(new Pagination(20, 1))).ReturnsAsync(new PagedData<string>(1, ["A"]));
 
         var context = HttpContextFactory.Create();
 
-        var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object, _linksService.Object);
+        var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object, _linksService.Object, _accessor.Object);
 
         await sut.ExecuteAsync(context);
 
@@ -35,7 +38,7 @@ public class ListTests
 
         var context = HttpContextFactory.Create();
 
-        var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object, _linksService.Object);
+        var sut = await Api.Features.Customers.Controllers.Customers.List(_repository.Object, _linksService.Object, _accessor.Object);
 
         await sut.ExecuteAsync(context);
 

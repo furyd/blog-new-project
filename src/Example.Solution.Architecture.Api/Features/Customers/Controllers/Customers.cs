@@ -5,6 +5,7 @@ using Example.Solution.Architecture.Api.Models;
 using Example.Solution.Architecture.Api.Services.Interfaces;
 using Example.Solution.Architecture.Domain.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace Example.Solution.Architecture.Api.Features.Customers.Controllers;
 
@@ -13,6 +14,7 @@ public static class Customers
     public static async Task<IResult> List(
         [FromServices] ICustomersRepository repository,
         [FromServices] ILinksService service,
+        [FromServices] IHttpContextAccessor httpContextAccessor,
         [FromQuery(Name = QueryStrings.PageSize)] int pageSize = 20,
         [FromQuery(Name = QueryStrings.PageNumber)] int currentPage = 1
         )
@@ -26,9 +28,11 @@ public static class Customers
             return Results.NoContent();
         }
 
-        var links = service.GetLinks(pagination, results.RecordCount);
+        var links = service.GetLinks(pagination, results.RecordCount).ToArray();
 
-        return new CustomResults.PagedJsonResult(results.Data, links);
+        httpContextAccessor.HttpContext!.Response.Headers.Link = new StringValues(links);
+
+        return new CustomResults.JsonResult(results.Data);
     }
 
     public static async Task<IResult> Get(
