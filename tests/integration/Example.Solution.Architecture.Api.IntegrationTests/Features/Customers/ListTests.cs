@@ -3,6 +3,7 @@ using Example.Solution.Architecture.Api.Features.Customers.Constants;
 using Example.Solution.Architecture.Api.Features.Customers.Models.Responses;
 using Example.Solution.Architecture.Api.IntegrationTests.WebApplicationFactories;
 using FluentAssertions;
+using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Text.Json;
 
@@ -26,6 +27,8 @@ public class ListTests
         var sut = await client.GetAsync(Routes.Root);
 
         sut.StatusCode.Should().Be(HttpStatusCode.OK);
+        sut.Headers.Contains(HeaderNames.Link).Should().BeTrue();
+        sut.Headers.GetValues(HeaderNames.Link).Should().NotBeNullOrEmpty();
 
         var content = await JsonSerializer.DeserializeAsync<List<Customer>>(await sut.Content.ReadAsStreamAsync());
 
